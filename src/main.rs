@@ -1,3 +1,5 @@
+// ヒットアンドブローゲーム
+
 use std::io::{self, Write};
 /* 
  Rustの標準ライブラリ(std:Standard Library)からioモジュールをインポート
@@ -7,10 +9,12 @@ use std::io::{self, Write};
  しかし、今回はioモジュールを明示的にインポートしている。慣れのためである。
 */
 
+/// ヒットアンドブローゲームのメイン関数
 fn main() {
     println!("ヒットアンドブロー");
     println!("Hit and Blow");
     println!("---------------------");
+    // ゲームのルールを定義する文字列
     // : &'static strは文字列リテラルを示す型
     let game_rules = "
         ルール
