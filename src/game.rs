@@ -6,6 +6,11 @@ use rand::thread_rng;
 /// ゲームの状態を管理する構造体
 pub struct Game {
     /// 正解の数字（4桁）
+    /// Vec<u8>は、動的な長さの配列を表す Vector 型
+    /// u8 は、0から255までの整数を表す型
+    /// u8以外の整数型としては、i8, i16, i32, i64, u16, u32, u64 などがある
+    /// 実数を扱う型としては、f32, f64 などがある
+    /// ここでlet mutが付いてないのは、構造体のフィールドとして定義しているから
     answer: Vec<u8>,
     /// 現在の試行回数
     attempts: u8,
@@ -23,12 +28,13 @@ pub struct GuessResult {
     pub blows: u8,
     /// 正解かどうか
     pub is_correct: bool,
-    /// 残りの試行回数
-    pub remaining_attempts: u8,
     /// ゲームオーバーかどうか
     pub is_game_over: bool,
 }
 
+//// ゲームのロジックを管理する構造体
+/// implは、構造体にメソッドを追加するためのキーワード
+/// classのようなもの
 impl Game {
     /// 新しいゲームを作成する
     pub fn new() -> Self {
@@ -87,6 +93,8 @@ impl Game {
         // ブローをカウント（数字は一致するが位置が異なる）
         for i in 0..4 {
             for j in 0..4 {
+                // 同じ位置の数字はカウントしない
+                // guess[i]がself.answer[j]と一致するが、iとjが異なる場合
                 if i != j && guess[i] == self.answer[j] {
                     blows += 1;
                 }
@@ -100,15 +108,16 @@ impl Game {
         let remaining_attempts = self.max_attempts - self.attempts;
         
         // ゲームオーバーかどうかを判定
+        // 正解した場合、または試行回数が0になった場合 is_game_overをtrueにする
         if is_correct || remaining_attempts == 0 {
             self.is_game_over = true;
         }
         
+        // GuessResult構造体を返す
         GuessResult {
             hits,
             blows,
             is_correct,
-            remaining_attempts,
             is_game_over: self.is_game_over,
         }
     }
@@ -150,6 +159,9 @@ impl Game {
     }
 }
 
+/// テスト用のモジュール
+/// cfg(test)は、テストコードをコンパイルするための条件を指定するための属性
+/// これにより、テストコードは通常のビルドには含まれず、テスト実行時のみコンパイルされる
 #[cfg(test)]
 mod tests {
     use super::*;

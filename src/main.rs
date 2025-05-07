@@ -1,70 +1,84 @@
 // ヒットアンドブローゲーム
+// メインモジュール
 
-use std::io::{self, Write};
-/* 
- Rustの標準ライブラリ(std:Standard Library)からioモジュールをインポート
- ioモジュールは、入出力操作を行うための機能を提供します。
- Writeトレイトは、データを書き込むためのメソッドを提供します。
- 通常stdはデフォルトでインポートされてるので省略できる。
- しかし、今回はioモジュールを明示的にインポートしている。慣れのためである。
-*/
+// 自作モジュールをインポート
+mod game; // Game運用などのモジュール
+mod io; // 入出力処理のモジュール
+
+// 自作モジュールから必要な要素をインポート
+//gameモジュールからGame構造体をインポート
+use game::Game;
 
 /// ヒットアンドブローゲームのメイン関数
 fn main() {
-    println!("ヒットアンドブロー");
-    println!("Hit and Blow");
-    println!("---------------------");
-    // ゲームのルールを定義する文字列
-    // : &'static strは文字列リテラルを示す型
-    let game_rules = "
-        ルール
-        1. 4桁の数字を当てるゲームです。
-        2. 各桁は1から6までの数字で、同じ数字は使いません。
-        3. ユーザーが入力した数字と正解の数字を比較し、ヒットとブローを教えます。
-        4. ヒットは正しい位置にある数字、ブローは正しい数字だが位置が違うものです。
-        5. ゲームは10回まで続きます。
-    ";
+    // ゲームのタイトルとルールを表示
+    // ioモジュールの関数を使用
+    io::display_title();
+    io::display_rules();
     
-    println!("{}", game_rules);
-    
-    // 無限ループの開始
+    // ゲームループ
     loop {
-        // ゲームのロジックをここに追加
-        print!("ゲームを開始します...\n");
-        //ゲームの関数がここに入る
-        print!("正解です！");
+        // ゲーム開始のメッセージを表示
+        io::display_game_start();
+        
+        // 新しいゲームを作成
+        // new()メソッドを使用してGame構造体のインスタンスを作成
+        let mut game = Game::new();
+        
+        // デバッグ用：正解を表示（本番環境ではコメントアウト）
+        // println!("デバッグ用 - 正解: {:?}", game.get_answer());
+        
+        // ゲームが終了するまでループ
+        // is_game_over()メソッドを使用してゲームの状態を確認
+        // game.guess()メソッド内で、is_game_overフラグを更新
+        //回数オーバーまたは正解の場合、is_game_overフラグがtrueになる
+        while !game.is_game_over() {
+            // 現在の試行回数を取得
+            let current_attempt = game.get_attempts();
+            let max_attempts = game.get_max_attempts();
+            
+            // 数字入力のプロンプトを表示
+            io::display_guess_prompt(current_attempt, max_attempts);
+            
+            // ユーザーからの入力を取得
+            let input = io::get_input("");
+            
+            // 入力を解析
+            match Game::parse_input(&input) {
+                Some(guess) => {
+                    // 予想を判定
+                    let result = game.guess(&guess);
+                    
+                    // 結果を表示
+                    io::display_result(result.hits, result.blows, current_attempt + 1, max_attempts);
+                    
+                    // 正解の場合
+                    if result.is_correct {
+                        io::display_correct();
+                    }
+                    // ゲームオーバーの場合
+                    else if result.is_game_over {
+                        io::display_game_over(game.get_answer());
+                    }
+                },
+                None => {
+                    // 入力エラーの場合
+                    io::display_input_error();
+                }
+            }
+        }
+        
+        // ゲーム継続の確認
         print!("続けますか？ (y/n): ");
-        /* バッファをフラッシュして即座に表示
-        標準出力に書き込まれたデータを即座に表示するためにflush()メソッドを使用
-        これをやらないと、バッファリングのために出力が遅れることがある
-         */
-        io::stdout().flush().unwrap(); 
-        
-        // ユーザーからの入力を受け取る
-        let mut input = String::new(); // 入力用の文字列を初期化
-        io::stdin().read_line(&mut input).unwrap(); // 標準入力から1行読み込む
-        
-        // 入力を小文字にして、trimで空白を削除
-        let input = input.trim().to_lowercase(); 
-
-        /* letとlet mutの違いは
-        letは不変な変数(immutable)を定義するために使用される。定数のようなもの。
-        let mutは可変な変数(mutable)を定義するために使用される。
-         */
-        /* 変数名の後ろの : Stringについて
-        型アノテーション(type annotation)は、変数の型を明示的に指定するためのもの。
-        付けないことも可能だが、型を明示することでコードの可読性が向上する。
-        どちらかと言えば、人間用かも。
-         */
+        let input = io::get_input("");
         
         // 'n'が入力された場合のみループを抜ける
         if input == "n" {
-            println!("ゲームを終了します。");
-            break;// ループを抜ける
-        } else {
-            println!("ゲームを続けます...");
+            io::display_game_end();
+            break; // ループを抜ける
         }
     }
+    
     // ゲーム終了後のメッセージ
     println!("ゲームが終了しました。");
 }

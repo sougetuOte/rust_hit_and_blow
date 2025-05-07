@@ -1,6 +1,13 @@
+# package はCargo.toml を置いたディレクトリ全体を指す概念。
 [package]
+# name はパッケージの名前を指定する。
+# ここでは hit_and_blow という名前のパッケージを作成する。
 name = "hit_and_blow"
+# version はパッケージのバージョンを指定する。
 version = "0.1.0"
+# edition は Rust のエディションを指定する。2015,2018,2021,2024 のいずれかを指定する。
 edition = "2024"
 
+# クレートが依存する外部ライブラリ（＝“クレート”）を列挙する。
 [dependencies]
+rand = "0.8.5"
