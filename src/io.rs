@@ -1,6 +1,6 @@
-// CUI 入力・表示ユーティリティ
-//もう少し大きなプログラムであれば、リテラルは外出しても良いかもしれないが、
-//この程度のプログラムでは、リテラルを直接書いても良いと思う。
+//! CUI 入力・表示ユーティリティ
+//! もう少し大きなプログラムであれば、リテラルは外出しても良いかもしれないが、
+//! この程度のプログラムでは、リテラルを直接書いても良いと思う。
 
 use std::io::{self, Write};
 
@@ -22,9 +22,7 @@ pub fn get_input(prompt: &str) -> String {
 
 /// ゲームのタイトルを表示する
 pub fn display_title() {
-    println!("ヒットアンドブロー");
-    println!("Hit and Blow");
-    println!("---------------------");
+    println!("ヒットアンドブロー\nHit and Blow\n---------------------\n");
 }
 
 /// ゲームのルールを表示する
@@ -56,6 +54,8 @@ pub fn display_correct() {
 pub fn display_game_over(answer: &[u8]) {
     println!("ゲームオーバー！");
     print!("正解は: ");
+    // 正解の数字を表示
+    // answer(Vec<u8>)をループして、各数字を表示
     for digit in answer {
         print!("{}", digit);
     }

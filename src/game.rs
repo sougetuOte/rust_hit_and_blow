@@ -1,5 +1,6 @@
-// ヒットアンドブローゲームのロジック
-
+//! ヒットアンドブローゲームのロジック
+//! rand::seq::SliceRandom　ランダムな数値を生成するためのモジュール
+//! rand::thread_rng　スレッドローカルな乱数生成器を使用するためのモジュール
 use rand::seq::SliceRandom;
 use rand::thread_rng;
 
@@ -11,9 +12,10 @@ pub struct Game {
     /// u8以外の整数型としては、i8, i16, i32, i64, u16, u32, u64 などがある
     /// 実数を扱う型としては、f32, f64 などがある
     /// ここでlet mutが付いてないのは、構造体のフィールドとして定義しているから
+    /// iとuの違いは、iは符号付き整数、uは符号なし整数を表す。数値はビット数。8なら8ビット。
     answer: Vec<u8>,
-    /// 現在の試行回数
-    attempts: u8,
+    /// 現在の試行回数。英語で「試行回数」を意味する
+    attempts: u8, 
     /// 最大試行回数
     max_attempts: u8,
     /// ゲームが終了したかどうか
@@ -34,18 +36,22 @@ pub struct GuessResult {
 
 //// ゲームのロジックを管理する構造体
 /// implは、構造体にメソッドを追加するためのキーワード
-/// classのようなもの
+/// 構造体にメソッドが付いてるので、classのようなもの
 impl Game {
-    /// 新しいゲームを作成する
+    /// 新しいゲームを作成する関数
+    /// pub fnは、publicな関数を定義するためのキーワード
+    /// new()は、構造体のインスタンスを生成するための特別な関数
+    /// Selfは、現在の構造体(Game)を指すキーワード
     pub fn new() -> Self {
         // 1から6までの数字を使って、重複のない4桁の数字を生成
         let mut numbers = vec![1, 2, 3, 4, 5, 6];
         let mut rng = thread_rng();
         numbers.shuffle(&mut rng);
         
-        // 最初の4つの数字を取得
+        // シャッフルした数値のうち、最初の4つの数字を取得
         let answer = numbers.into_iter().take(4).collect();
         
+        // fnの最後に書くことで、Game構造体のインスタンスを生成して返す
         Game {
             answer,
             attempts: 0,
@@ -132,9 +138,11 @@ impl Game {
         
         let mut result = Vec::with_capacity(4);
         
-        // 各文字を数字に変換
+        // 入力した各文字をinputから取りだし、数字に変換
         for c in input.chars() {
             // 文字が1-6の範囲内の数字であることを確認
+            // to_digit(10)は、10進数の数字に変換するメソッド
+            //radix: 10 は、10進数を指定するための引数
             if let Some(digit) = c.to_digit(10) {
                 if digit >= 1 && digit <= 6 {
                     result.push(digit as u8);
